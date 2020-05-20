@@ -23,12 +23,15 @@ COMP_LINK=60
 ALTU_LINK=55
 COMP_INI=27
 ALTU_INI=35
+COMP_LAVA=200
+ALTU_LAVA=150
 
 window=pygame.display.set_mode((COMP,ALTU))
 pygame.display.set_caption ("Jogo Fodinha")
 fundo=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/teste cenario.png').convert()
 fundo=pygame.transform.scale (fundo,(COMP,ALTU))
-
+imageml=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/lava.png').convert()
+imageml=pygame.transform.scale (imageml, (COMP_LAVA,ALTU_LAVA))
 
 def load_spritesheet(spritesheet, rows, columns):
     # Calcula a largura e altura de cada sprite.
@@ -95,15 +98,26 @@ class Link (pygame.sprite.Sprite):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
  
-        if self.rect.right > COMP:
-            self.rect.right = COMP
-        if self.rect.left < 0:
-            self.rect.left = 0
+        if self.rect.right > 10+COMP:
+            self.rect.right = 10+COMP
+        if self.rect.left < -15:
+            self.rect.left = -15
 
-        if self.rect.bottom>ALTU:
-            self.rect.bottom=ALTU
-        if self.rect.top<0:
-            self.rect.top=0
+        if self.rect.bottom>10+ALTU:
+            self.rect.bottom=10+ALTU
+        if self.rect.top<-10:
+            self.rect.top=-10
+        
+
+        if self.speedx>0:
+            self.state=Adireita
+        elif self.speedx<0:
+            self.state=Aesquerda
+        if self.speedy>0:
+            self.state=Abaixo
+        elif self.speedy<0:
+            self.state=Acima
+
 
         now = pygame.time.get_ticks()
 
@@ -134,7 +148,7 @@ class Link (pygame.sprite.Sprite):
             self.rect.center = center
 
 class Inimigo (pygame.sprite.Sprite):
-    def __init__ (self,imagem,link):
+    def __init__ (self,imagem,link,sheet):
         pygame.sprite.Sprite.__init__(self)
         self.image = imagem
         self.rect = self.image.get_rect()
@@ -145,22 +159,187 @@ class Inimigo (pygame.sprite.Sprite):
 
         self.link=link
         
+        sheet_i=pygame.transform.scale (sheet,(COMP_LINK*2,ALTU_LINK*3))
+        spritesheet = load_spritesheet(sheet_i, 4, 4)
+
+        self.animations = {
+            Acima: spritesheet[12:15],
+            Abaixo: spritesheet[0:3],
+            Adireita: spritesheet[4:7],
+            Aesquerda: spritesheet[8:11],
+        }
+
+        self.state = Adireita
+        self.animation = self.animations[self.state]
+        
+        self.frame = 0
+        self.image = self.animation[self.frame]
+        self.rect=self.image.get_rect()
+
+        self.last_update = pygame.time.get_ticks()
+        self.frame_ticks = 150
+
+
     def update (self):
-        centerx=self.link.rect.centerx
+        centerxl=self.link.rect.centerx
+        centeryl=self.link.rect.centery
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.left<=0 or self.rect.right>=COMP:
-            self.speedx=-self.speedx
 
+        if self.rect.left<0 or self.rect.right>COMP:
+            self.speedx=-self.speedx
+        if self.rect.top<0 or self.rect.bottom>ALTU:
+            self.speedy=-self.speedy
+        
+        
+        
+        if self.speedx>0:
+            self.state=Adireita
+        elif self.speedx<0:
+            self.state=Aesquerda
+        if self.speedy>0:
+            self.state=Abaixo
+        elif self.speedy<0:
+            self.state=Acima
+
+        centerx=self.rect.centerx 
+        centery=self.rect.centery
+        if (((centerx-centerxl)**2)<10000) and (((centery-centeryl))**2<10000):
+                direita=(self.rect.right-self.link.rect.left)**2
+                esquerda=(self.rect.left-self.link.rect.right)**2
+                cima=(self.rect.top-self.link.rect.bottom)**2
+                baixo=(self.rect.bottom-self.link.rect.top)**2
+                if direita<esquerda and direita<cima and direita<baixo and self.state==Adireita:
+                    self.speedx+=0
+                    self.speedy=0
+                elif direita<esquerda and direita<cima and direita<baixo and self.state==Aesquerda:
+                    self.speedx+=4
+                    self.speedy=0
+                elif direita<esquerda and direita<cima and direita<baixo and self.state==Acima:
+                    self.speedx+=2
+                    self.speedy+=2
+                elif direita<esquerda and direita<cima and direita<baixo and self.state==Abaixo:
+                    self.speedx+=2
+                    self.speedy-=2
+                
+                elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Adireita:
+                    self.speedx-=4
+                    self.speedy=0
+                elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Aesquerda:
+                    self.speedx+=0
+                    self.speedy=0
+                elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Acima:
+                    self.speedx-=2
+                    self.speedy+=2
+                elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Abaixo:
+                    self.speedx-=2
+                    self.speedy-=2
+
+                elif cima<direita and cima<esquerda and cima<baixo and self.state==Adireita:
+                    self.speedx-=2
+                    self.speedy-=2
+                elif cima<direita and cima<esquerda and cima<baixo and self.state==Aesquerda:
+                    self.speedx+=2
+                    self.speedy-=2
+                elif cima<direita and cima<esquerda and cima<baixo and self.state==Acima:
+                    self.speedx=0
+                    self.speedy+=0
+                elif cima<direita and cima<esquerda and cima<baixo and self.state==Abaixo:
+                    self.speedx=0
+                    self.speedy-=4
+            
+                elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Adireita:
+                    self.speedx-=2
+                    self.speedy+=2
+                elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Aesquerda:
+                    self.speedx+=2
+                    self.speedy+=2
+                elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Acima:
+                    self.speedx=0
+                    self.speedy+=4
+                elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Abaixo:
+                    self.speedx=0
+                    self.speedy+=0
+
+        now = pygame.time.get_ticks()
+
+        # Verifica quantos ticks se passaram desde a ultima mudança de frame.
+        elapsed_ticks = now - self.last_update
+
+        # Se já está na hora de mudar de imagem...
+        if elapsed_ticks > self.frame_ticks:
+
+            # Marca o tick da nova imagem.
+            self.last_update = now
+
+            # Avança um quadro.
+            self.frame += 1
+
+            # Atualiza animação atual
+            self.animation = self.animations[self.state]
+            # Reinicia a animação caso o índice da imagem atual seja inválido
+            if self.frame >= len(self.animation):
+                self.frame = 0
+            
+            # Armazena a posição do centro da imagem
+            center = self.rect.center
+            
+            # Atualiza imagem atual
+            self.image = self.animation[self.frame]
+            # Atualiza os detalhes de posicionamento
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+
+            
+
+                
+                
+
+
+                
+
+class Lava (pygame.sprite.Sprite):
+    def __init__ (self, imagem,posx,posy,link):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = imagem
+        self.rect = self.image.get_rect()
+        self.rect.x=posx
+        self.rect.y=posy
+        self.link=link
+        
+    # def colisao (self):
+    #     if self.link.rect.left-15<self.rect.right and (self.link.rect.top-10>self.rect.top and self.link.rect.bottom+10<self.rect.bottom):
+    #         return True
+
+    #     elif self.link.rect.right+10>self.rect.left and (self.link.rect.top-10>self.rect.top and self.link.rect.bottom+10<self.rect.bottom):
+    #         return True
+        
+    #     elif self.link.rect.top-10<self.rect.bottom and (self.link.rect.right+10<self.rect.right and self.link.rect.left-15>self.rect.left):
+    #         return True 
+        
+    #     elif self.link.rect.bottom+10>self.rect.top and (self.link.rect.right+10<self.rect.right and self.link.rect.left-15>self.rect.left):
+    #         return True
+
+    #     else:
+    #         return False
 
 
 
 sheet_m=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/sheet_m.png').convert_alpha()
+sheet_i=pygame.image.load ('C://Users/thpro/Desktop/Desoft/Projeto-Final/sheet_i4.png').convert_alpha()
 inimigo_m=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/linkfrente.png').convert()
+
 link=Link(sheet_m)
-inimigo=Inimigo(inimigo_m,link)
+inimigo=Inimigo(inimigo_m,link,sheet_i)
+lava=Lava(imageml,0,0,link)
+
 all_sprites=pygame.sprite.Group()
+all_lava=pygame.sprite.Group()
+all_enemies=pygame.sprite.Group()
+all_lava.add (lava)
+all_sprites.add (lava)
 all_sprites.add (link)
+all_enemies.add (inimigo)
 all_sprites.add (inimigo)
 game=True
 clock = pygame.time.Clock()
@@ -177,36 +356,46 @@ while game:
                 
         if event.type==pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key==pygame.K_a:
-                link.speedx -= 2
-                link.state=Aesquerda
+                link.speedx -= 3
+                
             if event.key == pygame.K_RIGHT or event.key==pygame.K_d:
-                link.speedx += 2
-                link.state=Adireita
+                link.speedx += 3
+                
             if event.key == pygame.K_UP or event.key==pygame.K_w:
-                link.speedy -= 2
-                link.state=Acima
+                link.speedy -= 3
+                
             if event.key == pygame.K_DOWN or event.key==pygame.K_s:
-                link.speedy += 2
-                link.state=Abaixo
+                link.speedy += 3
+                
        
         if event.type == pygame.KEYUP:
            
             if event.key == pygame.K_LEFT or event.key==pygame.K_a:
-                link.speedx += 2
+                link.speedx += 3
                 link.state=Pesquerda
             if event.key == pygame.K_RIGHT or event.key==pygame.K_d:
-                link.speedx -= 2
+                link.speedx -= 3
                 link.state=Pdireita
             if event.key == pygame.K_UP or event.key==pygame.K_w:
-                link.speedy += 2
+                link.speedy += 3
                 link.state=Pcima
             if event.key == pygame.K_DOWN or event.key==pygame.K_s:
-                link.speedy -= 2
+                link.speedy -= 3
                 link.state=Pbaixo
+    
 
+    # hit=lava.colisao()
+    # if hit==True:
+    #     game=False
+
+    hitsl = pygame.sprite.spritecollide(link, all_lava, False)
+    hitsi = pygame.sprite.spritecollide(link,all_enemies,False)
+    if len(hitsl) > 0 or len (hitsi)>0:
+        game = False
 
     window.fill((0,0,0))
     window.blit (fundo,(0,0))
+    
     all_sprites.update()
     all_sprites.draw(window)
     pygame.display.update()
