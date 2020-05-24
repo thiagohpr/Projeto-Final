@@ -21,8 +21,7 @@ COMP=514
 ALTU=354
 COMP_LINK=60
 ALTU_LINK=55
-COMP_INI=27
-ALTU_INI=35
+
 COMP_LAVA=200
 ALTU_LAVA=150
 
@@ -92,8 +91,11 @@ class Link (pygame.sprite.Sprite):
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 100
+        self.hitbox=[self.rect.x+15,self.rect.y+12,COMP_LINK-35,ALTU_LINK-23]
 
     def update (self):
+        
+        
 
         self.rect.x += self.speedx
         self.rect.y += self.speedy
@@ -111,12 +113,25 @@ class Link (pygame.sprite.Sprite):
 
         if self.speedx>0:
             self.state=Adireita
+            self.hitbox=[self.rect.x+22,self.rect.y+9,COMP_LINK-35,ALTU_LINK-22]
         elif self.speedx<0:
             self.state=Aesquerda
+            self.hitbox=[self.rect.x+17,self.rect.y+10,COMP_LINK-35,ALTU_LINK-23]
         if self.speedy>0:
             self.state=Abaixo
+            self.hitbox=[self.rect.x+15,self.rect.y+12,COMP_LINK-35,ALTU_LINK-23]
         elif self.speedy<0:
             self.state=Acima
+            self.hitbox=[self.rect.x+15,self.rect.y+8,COMP_LINK-35,ALTU_LINK-26]
+
+        if self.state==Pdireita:
+            self.hitbox=[self.rect.x+13,self.rect.y+11,COMP_LINK-36,ALTU_LINK-22]
+        elif self.state==Pesquerda:
+            self.hitbox=[self.rect.x+16,self.rect.y+11,COMP_LINK-36,ALTU_LINK-22]
+        elif self.state==Pbaixo:
+            self.hitbox=[self.rect.x+15,self.rect.y+12,COMP_LINK-37,ALTU_LINK-24]
+        elif self.state==Pcima:
+            self.hitbox=[self.rect.x+15,self.rect.y+13,COMP_LINK-38,ALTU_LINK-26]
 
 
         now = pygame.time.get_ticks()
@@ -148,12 +163,10 @@ class Link (pygame.sprite.Sprite):
             self.rect.center = center
 
 class Inimigo (pygame.sprite.Sprite):
-    def __init__ (self,imagem,link,sheet):
+    def __init__ (self,link,sheet):
         pygame.sprite.Sprite.__init__(self)
-        self.image = imagem
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, COMP-COMP_INI )
-        self.rect.y = random.randint(0, ALTU-ALTU_INI)
+        
+        
         self.speedx = 2
         self.speedy = 0
 
@@ -175,12 +188,15 @@ class Inimigo (pygame.sprite.Sprite):
         self.frame = 0
         self.image = self.animation[self.frame]
         self.rect=self.image.get_rect()
+        self.rect.x = random.randint (0,COMP-COMP_LINK)
+        self.rect.y = random.randint (0,ALTU-ALTU_LINK)
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 150
 
-
+        self.hitbox=[self.rect.x+7,self.rect.y+3,COMP_LINK-34,ALTU_LINK-15]
     def update (self):
+        
         centerxl=self.link.rect.centerx
         centeryl=self.link.rect.centery
         self.rect.x += self.speedx
@@ -195,12 +211,16 @@ class Inimigo (pygame.sprite.Sprite):
         
         if self.speedx>0:
             self.state=Adireita
+            self.hitbox=[self.rect.x+7,self.rect.y+3,COMP_LINK-34,ALTU_LINK-15]
         elif self.speedx<0:
             self.state=Aesquerda
+            self.hitbox=[self.rect.x,self.rect.y,COMP_LINK-34,ALTU_LINK-15]
         if self.speedy>0:
             self.state=Abaixo
+            self.hitbox=[self.rect.x+4,self.rect.y+3,COMP_LINK-34,ALTU_LINK-15]
         elif self.speedy<0:
             self.state=Acima
+            self.hitbox=[self.rect.x+5,self.rect.y+1,COMP_LINK-35,ALTU_LINK-17]
 
         centerx=self.rect.centerx 
         centery=self.rect.centery
@@ -290,9 +310,6 @@ class Inimigo (pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.center = center
 
-            
-
-                
                 
 
 
@@ -307,40 +324,30 @@ class Lava (pygame.sprite.Sprite):
         self.rect.y=posy
         self.link=link
         
-    # def colisao (self):
-    #     if self.link.rect.left-15<self.rect.right and (self.link.rect.top-10>self.rect.top and self.link.rect.bottom+10<self.rect.bottom):
-    #         return True
-
-    #     elif self.link.rect.right+10>self.rect.left and (self.link.rect.top-10>self.rect.top and self.link.rect.bottom+10<self.rect.bottom):
-    #         return True
-        
-    #     elif self.link.rect.top-10<self.rect.bottom and (self.link.rect.right+10<self.rect.right and self.link.rect.left-15>self.rect.left):
-    #         return True 
-        
-    #     elif self.link.rect.bottom+10>self.rect.top and (self.link.rect.right+10<self.rect.right and self.link.rect.left-15>self.rect.left):
-    #         return True
-
-    #     else:
-    #         return False
 
 
 
 sheet_m=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/sheet_m.png').convert_alpha()
 sheet_i=pygame.image.load ('C://Users/thpro/Desktop/Desoft/Projeto-Final/sheet_i4.png').convert_alpha()
-inimigo_m=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/linkfrente.png').convert()
+
 
 link=Link(sheet_m)
-inimigo=Inimigo(inimigo_m,link,sheet_i)
+inimigo=Inimigo(link,sheet_i)
 lava=Lava(imageml,0,0,link)
 
 all_sprites=pygame.sprite.Group()
 all_lava=pygame.sprite.Group()
 all_enemies=pygame.sprite.Group()
+
+
 all_lava.add (lava)
 all_sprites.add (lava)
 all_sprites.add (link)
 all_enemies.add (inimigo)
 all_sprites.add (inimigo)
+
+
+
 game=True
 clock = pygame.time.Clock()
 FPS=60
@@ -384,18 +391,13 @@ while game:
                 link.state=Pbaixo
     
 
-    # hit=lava.colisao()
-    # if hit==True:
-    #     game=False
 
-    hitsl = pygame.sprite.spritecollide(link, all_lava, False)
-    hitsi = pygame.sprite.spritecollide(link,all_enemies,False)
-    if len(hitsl) > 0 or len (hitsi)>0:
-        game = False
+    
 
     window.fill((0,0,0))
     window.blit (fundo,(0,0))
-    
+    pygame.draw.rect (window,(255,0,0),link.hitbox,2)
+    pygame.draw.rect (window,(255,0,0),inimigo.hitbox,2)
     all_sprites.update()
     all_sprites.draw(window)
     pygame.display.update()
