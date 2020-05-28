@@ -1,7 +1,9 @@
 import pygame
 import random
+import time
 
 pygame.init ()
+pygame.font.init ()
 
 
 
@@ -31,6 +33,11 @@ fundo=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/teste cena
 fundo=pygame.transform.scale (fundo,(COMP,ALTU))
 imageml=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/lava.png').convert()
 imageml=pygame.transform.scale (imageml, (COMP_LAVA,ALTU_LAVA))
+
+score_font = pygame.font.Font('C:/Users/thpro/Desktop/Desoft/Projeto-Final/PressStart2P.ttf', 28)
+
+
+
 
 def load_spritesheet(spritesheet, rows, columns):
     # Calcula a largura e altura de cada sprite.
@@ -91,7 +98,8 @@ class Link (pygame.sprite.Sprite):
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 100
-        self.hitbox=[self.rect.x+15,self.rect.y+12,COMP_LINK-35,ALTU_LINK-23]
+        self.hitbox=pygame.Rect(self.rect.x+15,self.rect.y+12,COMP_LINK-35,ALTU_LINK-23)
+
 
     def update (self):
         
@@ -113,26 +121,27 @@ class Link (pygame.sprite.Sprite):
 
         if self.speedx>0:
             self.state=Adireita
-            self.hitbox=[self.rect.x+22,self.rect.y+9,COMP_LINK-35,ALTU_LINK-22]
+            self.hitbox=pygame.Rect(self.rect.x+26,self.rect.y+13,COMP_LINK-44,ALTU_LINK-29)
         elif self.speedx<0:
             self.state=Aesquerda
-            self.hitbox=[self.rect.x+17,self.rect.y+10,COMP_LINK-35,ALTU_LINK-23]
+            self.hitbox=pygame.Rect(self.rect.x+21,self.rect.y+14,COMP_LINK-44,ALTU_LINK-29)
         if self.speedy>0:
             self.state=Abaixo
-            self.hitbox=[self.rect.x+15,self.rect.y+12,COMP_LINK-35,ALTU_LINK-23]
+            self.hitbox=pygame.Rect(self.rect.x+20,self.rect.y+16,COMP_LINK-44,ALTU_LINK-29)
         elif self.speedy<0:
             self.state=Acima
-            self.hitbox=[self.rect.x+15,self.rect.y+8,COMP_LINK-35,ALTU_LINK-26]
+            self.hitbox=pygame.Rect(self.rect.x+19,self.rect.y+11,COMP_LINK-43,ALTU_LINK-31)
 
         if self.state==Pdireita:
-            self.hitbox=[self.rect.x+13,self.rect.y+11,COMP_LINK-36,ALTU_LINK-22]
+            self.hitbox=pygame.Rect(self.rect.x+18,self.rect.y+13,COMP_LINK-43,ALTU_LINK-26)
         elif self.state==Pesquerda:
-            self.hitbox=[self.rect.x+16,self.rect.y+11,COMP_LINK-36,ALTU_LINK-22]
+            self.hitbox=pygame.Rect(self.rect.x+18,self.rect.y+13,COMP_LINK-42,ALTU_LINK-26)
         elif self.state==Pbaixo:
-            self.hitbox=[self.rect.x+15,self.rect.y+12,COMP_LINK-37,ALTU_LINK-24]
+            self.hitbox=pygame.Rect(self.rect.x+16,self.rect.y+14,COMP_LINK-40,ALTU_LINK-29)
         elif self.state==Pcima:
-            self.hitbox=[self.rect.x+15,self.rect.y+13,COMP_LINK-38,ALTU_LINK-26]
+            self.hitbox=pygame.Rect(self.rect.x+16,self.rect.y+13,COMP_LINK-40,ALTU_LINK-28)
 
+        
 
         now = pygame.time.get_ticks()
 
@@ -166,8 +175,8 @@ class Inimigo (pygame.sprite.Sprite):
     def __init__ (self,link,sheet):
         pygame.sprite.Sprite.__init__(self)
         
-        
-        self.speedx = 2
+
+        self.speedx = 1
         self.speedy = 0
 
         self.link=link
@@ -194,7 +203,7 @@ class Inimigo (pygame.sprite.Sprite):
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 150
 
-        self.hitbox=[self.rect.x+7,self.rect.y+3,COMP_LINK-34,ALTU_LINK-15]
+        self.hitbox=pygame.Rect(self.rect.x+7,self.rect.y+3,COMP_LINK-34,ALTU_LINK-15)
     def update (self):
         
         centerxl=self.link.rect.centerx
@@ -211,16 +220,16 @@ class Inimigo (pygame.sprite.Sprite):
         
         if self.speedx>0:
             self.state=Adireita
-            self.hitbox=[self.rect.x+7,self.rect.y+3,COMP_LINK-34,ALTU_LINK-15]
+            self.hitbox=pygame.Rect(self.rect.x+9,self.rect.y+5,COMP_LINK-42,ALTU_LINK-19)
         elif self.speedx<0:
             self.state=Aesquerda
-            self.hitbox=[self.rect.x,self.rect.y,COMP_LINK-34,ALTU_LINK-15]
+            self.hitbox=pygame.Rect(self.rect.x+7,self.rect.y+3,COMP_LINK-41,ALTU_LINK-19)
         if self.speedy>0:
             self.state=Abaixo
-            self.hitbox=[self.rect.x+4,self.rect.y+3,COMP_LINK-34,ALTU_LINK-15]
+            self.hitbox=pygame.Rect(self.rect.x+6,self.rect.y+5,COMP_LINK-38,ALTU_LINK-20)
         elif self.speedy<0:
             self.state=Acima
-            self.hitbox=[self.rect.x+5,self.rect.y+1,COMP_LINK-35,ALTU_LINK-17]
+            self.hitbox=pygame.Rect(self.rect.x+6,self.rect.y+3,COMP_LINK-40,ALTU_LINK-19)
 
         centerx=self.rect.centerx 
         centery=self.rect.centery
@@ -233,50 +242,50 @@ class Inimigo (pygame.sprite.Sprite):
                     self.speedx+=0
                     self.speedy=0
                 elif direita<esquerda and direita<cima and direita<baixo and self.state==Aesquerda:
-                    self.speedx+=4
+                    self.speedx+=2
                     self.speedy=0
                 elif direita<esquerda and direita<cima and direita<baixo and self.state==Acima:
-                    self.speedx+=2
-                    self.speedy+=2
+                    self.speedx+=1
+                    self.speedy+=1
                 elif direita<esquerda and direita<cima and direita<baixo and self.state==Abaixo:
-                    self.speedx+=2
-                    self.speedy-=2
+                    self.speedx+=1
+                    self.speedy-=1
                 
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Adireita:
-                    self.speedx-=4
+                    self.speedx-=2
                     self.speedy=0
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Aesquerda:
                     self.speedx+=0
                     self.speedy=0
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Acima:
-                    self.speedx-=2
-                    self.speedy+=2
+                    self.speedx-=1
+                    self.speedy+=1
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Abaixo:
-                    self.speedx-=2
-                    self.speedy-=2
+                    self.speedx-=1
+                    self.speedy-=1
 
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Adireita:
-                    self.speedx-=2
-                    self.speedy-=2
+                    self.speedx-=1
+                    self.speedy-=1
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Aesquerda:
-                    self.speedx+=2
-                    self.speedy-=2
+                    self.speedx+=1
+                    self.speedy-=1
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Acima:
                     self.speedx=0
                     self.speedy+=0
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Abaixo:
                     self.speedx=0
-                    self.speedy-=4
+                    self.speedy-=2
             
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Adireita:
-                    self.speedx-=2
-                    self.speedy+=2
+                    self.speedx-=1
+                    self.speedy+=1
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Aesquerda:
-                    self.speedx+=2
-                    self.speedy+=2
+                    self.speedx+=1
+                    self.speedy+=1
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Acima:
                     self.speedx=0
-                    self.speedy+=4
+                    self.speedy+=2
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Abaixo:
                     self.speedx=0
                     self.speedy+=0
@@ -309,11 +318,7 @@ class Inimigo (pygame.sprite.Sprite):
             # Atualiza os detalhes de posicionamento
             self.rect = self.image.get_rect()
             self.rect.center = center
-
-                
-
-
-                
+     
 
 class Lava (pygame.sprite.Sprite):
     def __init__ (self, imagem,posx,posy,link):
@@ -322,31 +327,43 @@ class Lava (pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x=posx
         self.rect.y=posy
-        self.link=link
-        
+        self.hitbox=pygame.Rect (posx,posy,COMP_LAVA,ALTU_LAVA)
 
+
+
+
+
+def collided(sprite, other):
+    return sprite.hitbox.colliderect(other.hitbox)
 
 
 sheet_m=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/sheet_m.png').convert_alpha()
-sheet_i=pygame.image.load ('C://Users/thpro/Desktop/Desoft/Projeto-Final/sheet_i4.png').convert_alpha()
+sheet_i=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/sheet_i4.png').convert_alpha()
 
 
-link=Link(sheet_m)
-inimigo=Inimigo(link,sheet_i)
-lava=Lava(imageml,0,0,link)
 
 all_sprites=pygame.sprite.Group()
 all_lava=pygame.sprite.Group()
 all_enemies=pygame.sprite.Group()
 
 
+link=Link(sheet_m)
+lava=Lava(imageml,0,0,link)
+
+
 all_lava.add (lava)
 all_sprites.add (lava)
 all_sprites.add (link)
+
+
+inimigo=Inimigo (link,sheet_i)
 all_enemies.add (inimigo)
 all_sprites.add (inimigo)
 
 
+score=1
+lives=3
+maxini=10
 
 game=True
 clock = pygame.time.Clock()
@@ -356,7 +373,7 @@ FPS=60
 while game:
     clock.tick (FPS)
 
-
+ 
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             game=False
@@ -390,14 +407,49 @@ while game:
                 link.speedy -= 3
                 link.state=Pbaixo
     
+    if score%500==0 and len (all_enemies)<=maxini:
+        inimigo=Inimigo (link,sheet_i)
+        all_enemies.add (inimigo)
+        all_sprites.add (inimigo)
 
 
-    
+    hitsi=pygame.sprite.spritecollide(link, all_enemies, True, collided)
+    hitsl=pygame.sprite.spritecollide(link, all_lava, False, collided)
+    if len (hitsi)>0 or len (hitsl)>0:
+        lives-=1
+        
 
+    if lives==0:
+        game=False
+
+    score+=1
     window.fill((0,0,0))
     window.blit (fundo,(0,0))
-    pygame.draw.rect (window,(255,0,0),link.hitbox,2)
-    pygame.draw.rect (window,(255,0,0),inimigo.hitbox,2)
+
+    vertices=[(COMP-(COMP-4),ALTU-(ALTU-5)),(COMP-4,ALTU-(ALTU-5)),(COMP-4,ALTU-(ALTU-40)),(COMP-(COMP-4),ALTU-(ALTU-40))]
+    pygame.draw.polygon (window, (0,0,0), vertices)
+
+    # pygame.draw.rect (window,(255,0,0),link.hitbox,2)
+    # for inimigo in all_enemies:
+    #     pygame.draw.rect (window,(255,0,0),inimigo.hitbox,2)
+    
+    
+
+
+    text_surface = score_font.render("{:08d}".format(score), True, (255, 255, 0))
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (COMP / 2,  10)
+    window.blit(text_surface, text_rect)
+
+    text_surface = score_font.render(chr(9829) * lives, True, (255, 0, 0))
+    text_rect = text_surface.get_rect()
+    # text_rect.bottomleft = (10, ALTU - 10)
+    text_rect.bottomleft = (COMP/2 + 150,40)
+    window.blit(text_surface, text_rect)
+
+
+ 
+
     all_sprites.update()
     all_sprites.draw(window)
     pygame.display.update()
