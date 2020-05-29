@@ -19,21 +19,23 @@ Aesquerda=7
 
 
 
-COMP=514
-ALTU=354
-COMP_LINK=60
-ALTU_LINK=55
+COMP=1028
+ALTU=708
+
+COMP_LINK=65
+ALTU_LINK=60
 
 COMP_LAVA=200
-ALTU_LAVA=150
+ALTU_LAVA=45
+
+cinza=(46,46,46)
+vermelho=(255,0,0)
+
 
 window=pygame.display.set_mode((COMP,ALTU))
 pygame.display.set_caption ("Jogo Fodinha")
-fundo=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/teste cenario.png').convert()
-fundo=pygame.transform.scale (fundo,(COMP,ALTU))
 imageml=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/lava.png').convert()
 imageml=pygame.transform.scale (imageml, (COMP_LAVA,ALTU_LAVA))
-
 score_font = pygame.font.Font('C:/Users/thpro/Desktop/Desoft/Projeto-Final/PressStart2P.ttf', 28)
 
 
@@ -115,31 +117,31 @@ class Link (pygame.sprite.Sprite):
 
         if self.rect.bottom>10+ALTU:
             self.rect.bottom=10+ALTU
-        if self.rect.top<-10:
-            self.rect.top=-10
+        if self.rect.top<30:
+            self.rect.top=30
         
 
         if self.speedx>0:
             self.state=Adireita
-            self.hitbox=pygame.Rect(self.rect.x+26,self.rect.y+13,COMP_LINK-44,ALTU_LINK-29)
+            self.hitbox=pygame.Rect(self.rect.x+35,self.rect.y+14,COMP_LINK-48,ALTU_LINK-33)
         elif self.speedx<0:
             self.state=Aesquerda
-            self.hitbox=pygame.Rect(self.rect.x+21,self.rect.y+14,COMP_LINK-44,ALTU_LINK-29)
+            self.hitbox=pygame.Rect(self.rect.x+28,self.rect.y+16,COMP_LINK-49,ALTU_LINK-34)
         if self.speedy>0:
             self.state=Abaixo
-            self.hitbox=pygame.Rect(self.rect.x+20,self.rect.y+16,COMP_LINK-44,ALTU_LINK-29)
+            self.hitbox=pygame.Rect(self.rect.x+23,self.rect.y+19,COMP_LINK-47,ALTU_LINK-34)
         elif self.speedy<0:
             self.state=Acima
-            self.hitbox=pygame.Rect(self.rect.x+19,self.rect.y+11,COMP_LINK-43,ALTU_LINK-31)
+            self.hitbox=pygame.Rect(self.rect.x+23,self.rect.y+12,COMP_LINK-46,ALTU_LINK-35)
 
         if self.state==Pdireita:
-            self.hitbox=pygame.Rect(self.rect.x+18,self.rect.y+13,COMP_LINK-43,ALTU_LINK-26)
+            self.hitbox=pygame.Rect(self.rect.x+22,self.rect.y+15,COMP_LINK-49,ALTU_LINK-32)
         elif self.state==Pesquerda:
-            self.hitbox=pygame.Rect(self.rect.x+18,self.rect.y+13,COMP_LINK-42,ALTU_LINK-26)
+            self.hitbox=pygame.Rect(self.rect.x+21,self.rect.y+15,COMP_LINK-50,ALTU_LINK-31)
         elif self.state==Pbaixo:
-            self.hitbox=pygame.Rect(self.rect.x+16,self.rect.y+14,COMP_LINK-40,ALTU_LINK-29)
+            self.hitbox=pygame.Rect(self.rect.x+18,self.rect.y+16,COMP_LINK-44,ALTU_LINK-31)
         elif self.state==Pcima:
-            self.hitbox=pygame.Rect(self.rect.x+16,self.rect.y+13,COMP_LINK-40,ALTU_LINK-28)
+            self.hitbox=pygame.Rect(self.rect.x+18,self.rect.y+15,COMP_LINK-45,ALTU_LINK-33)
 
         
 
@@ -176,7 +178,7 @@ class Inimigo (pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
 
-        self.speedx = 1
+        self.speedx = 2
         self.speedy = 0
 
         self.link=link
@@ -213,27 +215,27 @@ class Inimigo (pygame.sprite.Sprite):
 
         if self.rect.left<0 or self.rect.right>COMP:
             self.speedx=-self.speedx
-        if self.rect.top<0 or self.rect.bottom>ALTU:
+        if self.rect.top<40 or self.rect.bottom>ALTU:
             self.speedy=-self.speedy
         
         
         
         if self.speedx>0:
             self.state=Adireita
-            self.hitbox=pygame.Rect(self.rect.x+9,self.rect.y+5,COMP_LINK-42,ALTU_LINK-19)
+            self.hitbox=pygame.Rect(self.rect.x+11,self.rect.y+5,COMP_LINK-47,ALTU_LINK-23)
         elif self.speedx<0:
             self.state=Aesquerda
-            self.hitbox=pygame.Rect(self.rect.x+7,self.rect.y+3,COMP_LINK-41,ALTU_LINK-19)
+            self.hitbox=pygame.Rect(self.rect.x+7,self.rect.y+3,COMP_LINK-43,ALTU_LINK-22)
         if self.speedy>0:
             self.state=Abaixo
-            self.hitbox=pygame.Rect(self.rect.x+6,self.rect.y+5,COMP_LINK-38,ALTU_LINK-20)
+            self.hitbox=pygame.Rect(self.rect.x+8,self.rect.y+6,COMP_LINK-42,ALTU_LINK-24)
         elif self.speedy<0:
             self.state=Acima
-            self.hitbox=pygame.Rect(self.rect.x+6,self.rect.y+3,COMP_LINK-40,ALTU_LINK-19)
+            self.hitbox=pygame.Rect(self.rect.x+7,self.rect.y+4,COMP_LINK-42,ALTU_LINK-25)
 
         centerx=self.rect.centerx 
         centery=self.rect.centery
-        if (((centerx-centerxl)**2)<10000) and (((centery-centeryl))**2<10000):
+        if (((centerx-centerxl)**2)<20000) and (((centery-centeryl))**2<20000):
                 direita=(self.rect.right-self.link.rect.left)**2
                 esquerda=(self.rect.left-self.link.rect.right)**2
                 cima=(self.rect.top-self.link.rect.bottom)**2
@@ -242,50 +244,50 @@ class Inimigo (pygame.sprite.Sprite):
                     self.speedx+=0
                     self.speedy=0
                 elif direita<esquerda and direita<cima and direita<baixo and self.state==Aesquerda:
-                    self.speedx+=2
+                    self.speedx+=4
                     self.speedy=0
                 elif direita<esquerda and direita<cima and direita<baixo and self.state==Acima:
-                    self.speedx+=1
-                    self.speedy+=1
+                    self.speedx+=2
+                    self.speedy+=2
                 elif direita<esquerda and direita<cima and direita<baixo and self.state==Abaixo:
-                    self.speedx+=1
-                    self.speedy-=1
+                    self.speedx+=2
+                    self.speedy-=2
                 
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Adireita:
-                    self.speedx-=2
+                    self.speedx-=4
                     self.speedy=0
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Aesquerda:
                     self.speedx+=0
                     self.speedy=0
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Acima:
-                    self.speedx-=1
-                    self.speedy+=1
+                    self.speedx-=2
+                    self.speedy+=2
                 elif esquerda<direita and esquerda<cima and esquerda<baixo  and self.state==Abaixo:
-                    self.speedx-=1
-                    self.speedy-=1
+                    self.speedx-=2
+                    self.speedy-=2
 
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Adireita:
-                    self.speedx-=1
-                    self.speedy-=1
+                    self.speedx-=2
+                    self.speedy-=2
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Aesquerda:
-                    self.speedx+=1
-                    self.speedy-=1
+                    self.speedx+=2
+                    self.speedy-=2
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Acima:
                     self.speedx=0
                     self.speedy+=0
                 elif cima<direita and cima<esquerda and cima<baixo and self.state==Abaixo:
                     self.speedx=0
-                    self.speedy-=2
+                    self.speedy-=4
             
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Adireita:
-                    self.speedx-=1
-                    self.speedy+=1
+                    self.speedx-=2
+                    self.speedy+=2
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Aesquerda:
-                    self.speedx+=1
-                    self.speedy+=1
+                    self.speedx+=2
+                    self.speedy+=2
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Acima:
                     self.speedx=0
-                    self.speedy+=2
+                    self.speedy+=4
                 elif baixo<direita and baixo<esquerda and baixo<cima and self.state==Abaixo:
                     self.speedx=0
                     self.speedy+=0
@@ -321,13 +323,13 @@ class Inimigo (pygame.sprite.Sprite):
      
 
 class Lava (pygame.sprite.Sprite):
-    def __init__ (self, imagem,posx,posy,link):
+    def __init__ (self, imagem,pos,link):
         pygame.sprite.Sprite.__init__(self)
         self.image = imagem
         self.rect = self.image.get_rect()
-        self.rect.x=posx
-        self.rect.y=posy
-        self.hitbox=pygame.Rect (posx,posy,COMP_LAVA,ALTU_LAVA)
+        self.rect.x=pos[0]
+        self.rect.y=pos[1]
+        self.hitbox=pygame.Rect (pos[0],pos[1],COMP_LAVA,ALTU_LAVA)
 
 
 
@@ -347,12 +349,15 @@ all_lava=pygame.sprite.Group()
 all_enemies=pygame.sprite.Group()
 
 
+posicoes=[[0,200],[500,650],[100,400],[800,500],[500,250],[150,100]]
+
 link=Link(sheet_m)
-lava=Lava(imageml,0,0,link)
 
+for pos in posicoes:
+    lava=Lava(imageml,pos,link)
+    all_lava.add (lava)
+    all_sprites.add (lava)
 
-all_lava.add (lava)
-all_sprites.add (lava)
 all_sprites.add (link)
 
 
@@ -362,8 +367,8 @@ all_sprites.add (inimigo)
 
 
 score=1
-lives=3
-maxini=10
+lives=270
+maxini=50
 
 game=True
 clock = pygame.time.Clock()
@@ -415,19 +420,24 @@ while game:
 
     hitsi=pygame.sprite.spritecollide(link, all_enemies, True, collided)
     hitsl=pygame.sprite.spritecollide(link, all_lava, False, collided)
-    if len (hitsi)>0 or len (hitsl)>0:
-        lives-=1
+    if len (hitsi)>0:
+        lives-=75
+    if len (hitsl)>0:
+        lives-=2
         
 
-    if lives==0:
+    if lives<=0:
+        lives=0
         game=False
 
     score+=1
-    window.fill((0,0,0))
-    window.blit (fundo,(0,0))
+    window.fill(cinza)
+   
 
     vertices=[(COMP-(COMP-4),ALTU-(ALTU-5)),(COMP-4,ALTU-(ALTU-5)),(COMP-4,ALTU-(ALTU-40)),(COMP-(COMP-4),ALTU-(ALTU-40))]
     pygame.draw.polygon (window, (0,0,0), vertices)
+    vertices2=(4,5,1020,35)
+    pygame.draw.rect (window,(0,255,0),vertices2,3)
 
     # pygame.draw.rect (window,(255,0,0),link.hitbox,2)
     # for inimigo in all_enemies:
@@ -441,12 +451,17 @@ while game:
     text_rect.midtop = (COMP / 2,  10)
     window.blit(text_surface, text_rect)
 
-    text_surface = score_font.render(chr(9829) * lives, True, (255, 0, 0))
+    text_surface = score_font.render(chr(9829), True, (255, 0, 0))
     text_rect = text_surface.get_rect()
-    # text_rect.bottomleft = (10, ALTU - 10)
-    text_rect.bottomleft = (COMP/2 + 150,40)
+    text_rect.bottomleft = (13,40)
     window.blit(text_surface, text_rect)
 
+
+    vida=[(55,14),(lives+55,14),(lives+55,30),(55,30)]
+    pygame.draw.polygon (window,vermelho,vida)
+    
+    vertices3=(55,14,270,16)
+    pygame.draw.rect (window,vermelho,vertices3,3)
 
  
 
