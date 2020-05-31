@@ -32,14 +32,36 @@ cinza=(46,46,46)
 vermelho=(255,0,0)
 
 
+game=False
+inicio=True
+
 window=pygame.display.set_mode((COMP,ALTU))
 pygame.display.set_caption ("Jogo Fodinha")
-imageml=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/lava.png').convert()
-imageml=pygame.transform.scale (imageml, (COMP_LAVA,ALTU_LAVA))
+imageml=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/lavasprite.png').convert_alpha()
 score_font = pygame.font.Font('C:/Users/thpro/Desktop/Desoft/Projeto-Final/PressStart2P.ttf', 28)
+score_font2=pygame.font.Font('C:/Users/thpro/Desktop/Desoft/Projeto-Final/PressStart2P.ttf', 15)
 
 
 
+with open ('recordes.txt','r') as file:
+    tudo=file.read()
+    lista=tudo.split("---")
+dic={}
+for i in range(len(lista)-1):
+    if i==0 or i%2==0:
+        dic[lista[i]]=int(lista[i+1])
+
+def verificascore (dic, score):
+    nome=0
+    for n,pont in dic.items():
+        if score>pont:
+            nome=n
+            break
+    if nome!=0:
+        return nome
+    else:
+        return False
+    
 
 def load_spritesheet(spritesheet, rows, columns):
     # Calcula a largura e altura de cada sprite.
@@ -172,7 +194,36 @@ class Link (pygame.sprite.Sprite):
             # Atualiza os detalhes de posicionamento
             self.rect = self.image.get_rect()
             self.rect.center = center
+class LinkI (pygame.sprite.Sprite):
+    def __init__ (self,sheet):
+        pygame.sprite.Sprite.__init__(self)
 
+        sheet_a=pygame.transform.scale (sheet,(COMP_LINK*27,ALTU_LINK*4))
+        self.spritesheet = load_spritesheet(sheet_a, 1, 8)
+        self.frame = 0
+        self.image = self.spritesheet[self.frame]
+        self.rect=self.image.get_rect()
+        self.rect.centerx=COMP/2
+        self.rect.bottom=230
+        self.last_update = pygame.time.get_ticks()
+        self.frame_ticks = 100
+    def update (self):
+        now = pygame.time.get_ticks()
+        elapsed_ticks = now - self.last_update
+        if elapsed_ticks > self.frame_ticks:
+            self.last_update = now
+            self.frame += 1
+            if self.frame >= len(self.spritesheet):
+                self.frame = 0
+            center = self.rect.center
+            self.image = self.spritesheet[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center = center
+        
+        
+
+
+    
 class Inimigo (pygame.sprite.Sprite):
     def __init__ (self,link,sheet):
         pygame.sprite.Sprite.__init__(self)
@@ -200,7 +251,7 @@ class Inimigo (pygame.sprite.Sprite):
         self.image = self.animation[self.frame]
         self.rect=self.image.get_rect()
         self.rect.x = random.randint (0,COMP-COMP_LINK)
-        self.rect.y = random.randint (0,ALTU-ALTU_LINK)
+        self.rect.y = random.randint (40,ALTU-ALTU_LINK)
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 150
@@ -325,11 +376,28 @@ class Inimigo (pygame.sprite.Sprite):
 class Lava (pygame.sprite.Sprite):
     def __init__ (self, imagem,pos,link):
         pygame.sprite.Sprite.__init__(self)
-        self.image = imagem
-        self.rect = self.image.get_rect()
+
+        self.spritesheet = load_spritesheet(imagem, 1, 4)
+        self.frame = 0
+        self.image = self.spritesheet[self.frame]
+        self.rect=self.image.get_rect()
         self.rect.x=pos[0]
         self.rect.y=pos[1]
         self.hitbox=pygame.Rect (pos[0],pos[1],COMP_LAVA,ALTU_LAVA)
+        self.last_update = pygame.time.get_ticks()
+        self.frame_ticks = 200
+    def update (self):
+        now = pygame.time.get_ticks()
+        elapsed_ticks = now - self.last_update
+        if elapsed_ticks > self.frame_ticks:
+            self.last_update = now
+            self.frame += 1
+            if self.frame >= len(self.spritesheet):
+                self.frame = 0
+            center = self.rect.center
+            self.image = self.spritesheet[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center = center
 
 
 
@@ -341,17 +409,20 @@ def collided(sprite, other):
 
 sheet_m=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/sheet_m.png').convert_alpha()
 sheet_i=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/sheet_i4.png').convert_alpha()
-
+sheet_a=pygame.image.load ('C:/Users/thpro/Desktop/Desoft/Projeto-Final/sheet_a.png').convert_alpha()
 
 
 all_sprites=pygame.sprite.Group()
 all_lava=pygame.sprite.Group()
 all_enemies=pygame.sprite.Group()
-
+linkin=pygame.sprite.Group()
 
 posicoes=[[0,200],[500,650],[100,400],[800,500],[500,250],[150,100]]
 
 link=Link(sheet_m)
+linki=LinkI(sheet_a)
+linkin.add (linki)
+
 
 for pos in posicoes:
     lava=Lava(imageml,pos,link)
@@ -370,9 +441,42 @@ score=1
 lives=270
 maxini=50
 
-game=True
+
 clock = pygame.time.Clock()
 FPS=60
+frames=0
+text=""
+seunome=""
+digitando=False
+digitado=False
+preto=(0,0,0)
+verde=(0,255,0)
+color=preto
+
+while inicio:
+    clock.tick (FPS)
+    window.fill (vermelho)
+
+    text_surface = score_font.render("{}".format("Sobrevivência do Link"), True, (255, 255, 0))
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (COMP / 2,  ALTU/2-100)
+    window.blit(text_surface, text_rect)
+    
+    text_surface = score_font2.render("{}".format("Aperte espaço para começar"), True, (255, 255, 255))
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (COMP / 2,  ALTU/2+50)
+    window.blit(text_surface, text_rect)
+
+    for event in pygame.event.get():
+        if event.type==pygame.QUIT:
+            inicio=False
+        if event.type==pygame.KEYDOWN:
+            if event.key==pygame.K_SPACE:
+                inicio=False
+                game=True
+    linkin.update()
+    linkin.draw (window)
+    pygame.display.update()
 
 
 while game:
@@ -429,6 +533,9 @@ while game:
     if lives<=0:
         lives=0
         game=False
+        fim=True
+        fim1=True
+
 
     score+=1
     window.fill(cinza)
@@ -468,5 +575,128 @@ while game:
     all_sprites.update()
     all_sprites.draw(window)
     pygame.display.update()
+
+while fim:
+    while fim1:
+        clock.tick (FPS)
+        window.fill (vermelho)
+        text_surface = score_font.render("{}".format("Você morreu!"), True, (255, 255, 255))
+        text_rect = text_surface.get_rect()
+        text_rect.centerx = COMP/2
+        text_rect.centery = ALTU/2
+        window.blit(text_surface, text_rect)
+        frames+=1
+        if frames>240:
+            fim1=False
+            fim2=True
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                fim1=False
+                fim=False
+        pygame.display.update()
+
+    while fim2:
+        clock.tick (FPS)
+        window.fill (vermelho)
+        nome=verificascore (dic,score)
+        
+
+
+        if nome!=False:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    fim2=False
+                    fim=False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if input_box.collidepoint(event.pos):
+                        digitando=True
+                        color=verde
+                if event.type == pygame.KEYDOWN:
+                    if digitando==True:
+                        if event.key == pygame.K_BACKSPACE and text!="":
+                            text = text[:-1]
+                        elif event.key == pygame.K_RETURN and text!="":
+                            seunome=text
+                            digitado=True
+                        else:
+                            text += event.unicode
+
+            input_box = pygame.Rect(364, 319, 300, 70)
+
+            text_surface = score_font.render("{}".format("Você está entre os 5 melhores!"), True, (255, 255, 255))
+            text_rect = text_surface.get_rect()
+            text_rect.centerx = COMP/2
+            text_rect.centery = 90
+            window.blit(text_surface, text_rect)
+
+            text_surface = score_font2.render("{}".format("Digite o seu nome:"), True, (255, 255, 255))
+            text_rect = text_surface.get_rect()
+            text_rect.centerx = COMP/2
+            text_rect.centery = 300
+            window.blit(text_surface, text_rect)
+
+            text_surface = score_font.render("{}".format(score), True, (255, 255, 0))
+            text_rect = text_surface.get_rect()
+            text_rect.centerx = COMP/2
+            text_rect.centery = 150
+            window.blit(text_surface, text_rect)
+
+
+            pygame.draw.rect(window,color, input_box, 4)
+            text_surface = score_font2.render("{}".format(text), True, (255, 255, 255))
+            text_rect = text_surface.get_rect()
+            text_rect.centerx = COMP/2
+            text_rect.centery = ALTU/2
+            window.blit(text_surface, text_rect)
+
+            if digitado==True:
+                fim2=False
+                fim3=True
+                novodic={}
+                dic2={}
+ 
+                for n,s in dic.items():
+                    if nome!=n:
+                        novodic[n]=s
+                    else:
+                        novodic[seunome]=score
+                        novodic[n]=s
+
+                i=0
+                for n,s in novodic.items():
+                    if i!=5:
+                        dic2[n]=s
+                        i+=1
+
+                recordes=""
+                i=0
+                for n,s in dic2.items():
+                    recordes+=n
+                    recordes+="---"
+                    recordes+=str(s)
+                    i+=1
+                    if i!=5:
+                        recordes+="---"
+
+                with open ('recordes.txt','w+') as file:
+                    file.write (recordes)
+        else:
+            fim3=True
+        
+        pygame.display.update()
+
+
+
+    while fim3:     #mostrar o top 5
+        clock.tick (FPS)
+        window.fill (vermelho)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                fim3=False
+                fim=False
+        pygame.display.update()
+
+    
+
 
 pygame.quit()
